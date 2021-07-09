@@ -1,14 +1,15 @@
 <template>
   <div class="login-view">
     <el-form class="login-form" ref="form" :model="form" label-width="80px" :rules="rules">
-      <el-form-item label="手机" prop="phoneNum">
-        <el-input v-model="form.phoneNum"></el-input>
+      <el-form-item  prop="phoneNum">
+        <el-input placeholder="请输入手机号" v-model="form.phoneNum"></el-input>
       </el-form-item>
-      <el-form-item label="密码" prop="pass">
-        <el-input type="password" v-model="form.pass" autocomplete="off"></el-input>
+      <el-form-item prop="code">
+        <el-input placeholder="请输入验证码" type="password" v-model="form.code" autocomplete="off"></el-input>
       </el-form-item>
+      <el-checkbox class="checkbox" v-model="checked">我以阅读并同意用户协议</el-checkbox>
       <el-form-item>
-        <el-button type="primary" class="submit-button" @click="onSubmit">立即登录</el-button>
+        <el-button type="primary" :loading="isloading" class="submit-button" @click="onSubmit">立即登录</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -20,15 +21,18 @@ export default {
     return {
       form: {
         phoneNum: '',
-        pass: ''
+        code: ''
       },
+      checked: true,
+      isloading: false,
       rules: {
         phoneNum: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
           { pattern: /^1[1,3,5,7,8,9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
         ],
-        pass: [
-          { required: true, message: '请输入密码', trigger: 'blur' }
+        code: [
+          { required: true, message: '请输入验证码', trigger: 'blur' },
+          { patten: /\d{6}/, message: '请输入正确的验证码', trigger: 'blur' }
         ]
       }
     }
@@ -54,6 +58,12 @@ export default {
     .login-form {
       width: 500px;
       min-height: 500px;
+      .checkbox {
+        position: relative;
+        left: -80px;
+        text-aligin: center;
+        margin-bottom: 20px;
+      }
       .submit-button {
         width: 100%;
       }
