@@ -1,0 +1,186 @@
+html {
+  min-width: 1300px;
+  height: 100%;
+  line-height: unset;
+  font-family: "Microsoft YaHei", "微软雅黑", "Source Han Sans SC", "HanHei SC", "PingFang SC", "Helvetica Neue", "Helvetica", Arail, sans-serif;
+  box-sizing: border-box;
+}
+
+body {
+  height: 100%;
+}
+
+#app {
+  height: 100%;
+}
+
+/*公共*/
+a {
+  outline: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+  text-decoration: none;
+}
+
+ul, li {
+  list-style:none;
+}
+
+div, h1, h2, h3, h4, h5, h6, p, ul, li {
+  margin: 0;
+  padding: 0;
+}
+
+.fl {
+  float: left;
+}
+.fr {
+  float: right;
+}
+
+.center{
+  margin: 0 auto;
+  width: 1200px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.clearfix {
+  &::after {
+    content: '.';
+    display: block;
+    height: 0;
+    line-height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+}
+
+// 统一添加flex布局样式
+.flex-row {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  flex-direction: row;
+}
+
+.flex-col {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: vertical;
+  flex-direction: column;
+}
+
+.flex-grow-0 {
+  min-width: 0;
+  -webkit-box-flex: 0;
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+.flex-grow-1 {
+  min-width: 0;
+  -webkit-box-flex: 1;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+.flex-x-center {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.flex-y-center {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  align-items: center;
+}
+
+.flex-xy-center {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-y-bottom {
+  display: flex;
+  align-items: flex-end;
+}
+
+.h100 {
+  height: 100%;
+}
+.w100 {
+  width: 100%;
+}
+.hw100 {
+  height: 100%;
+  width: 100%;
+}
+.main-box {
+  min-height: 100%;
+  width: 100%;
+}
+.text-over {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 130px;
+}
+.text-over2 {
+  display: -webkit-box;
+  text-overflow: -o-ellipsis-lastline;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+// 浏览器的滚动条样式修改
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-button:vertical {
+  display: none
+}
+
+::-webkit-scrollbar-corner, ::-webkit-scrollbar-track {
+  display: none;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 0;
+  background-color: rgba(0, 0, 0, .3)
+}
+
+::-webkit-scrollbar-thumb:vertical:hover {
+  background-color: rgba(0, 0, 0, .35)
+}
+
+::-webkit-scrollbar-thumb:vertical:active {
+  background-color: rgba(0, 0, 0, .38)
+}
+
+.el-image {
+  .image-slot {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+    color: #999;
+  }
+}

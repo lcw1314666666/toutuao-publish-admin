@@ -1,0 +1,13 @@
+/* Variables */
+
+// Base color
+$color-primary: #3484FF;
+$color-success: #13ce66;
+$color-warning: #ffba00;
+$color-danger: #ff4949;
+
+// The :export directive is the magic sauce for webpack
+// https://mattferderer.com/use-sass-variables-in-typescript-and-javascript
+:export {
+  colorPrimay: $color-primary;
+}

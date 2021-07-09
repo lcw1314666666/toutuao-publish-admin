@@ -1,0 +1,29 @@
+.el-input.show-word-limit {
+  .el-input__inner {
+    padding-right: 50px;
+  }
+}
+
+// 表格按钮样式
+.el-table.el-table--border span.btn {
+  position: relative;
+  display: inline-block;
+  padding: 0 15px;
+  color: $color-primary;
+  cursor: pointer;
+  &:after {
+    position: absolute;
+    top: 50%;
+    right: -1px;
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    content: "";
+    display: block;
+    height: 15px;
+    border-left: 1px solid $color-primary;
+    border-right: 1px solid #fdedd6;
+  }
+  &:last-of-type:after {
+    display: none;
+  }
+}
