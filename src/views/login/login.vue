@@ -1,13 +1,15 @@
 <template>
   <div class="login-view">
-    <el-form class="login-form" ref="form" :model="form" label-width="80px" :rules="rules">
-      <el-form-item  prop="phoneNum">
-        <el-input placeholder="请输入手机号" v-model="form.phoneNum"></el-input>
+    <el-form class="login-form" ref="login-form" :model="form" label-width="80px" :rules="rules">
+      <el-form-item  prop="mobile">
+        <el-input placeholder="请输入手机号" v-model="form.mobile"></el-input>
       </el-form-item>
       <el-form-item prop="code">
-        <el-input placeholder="请输入验证码" type="password" v-model="form.code" autocomplete="off"></el-input>
+        <el-input placeholder="请输入验证码" type="password" v-model="form.code"></el-input>
       </el-form-item>
-      <el-checkbox class="checkbox" v-model="checked">我以阅读并同意用户协议</el-checkbox>
+      <el-form-item prop="agree">
+        <el-checkbox class="checkbox"  v-model="form.agree">我以阅读并同意用户协议</el-checkbox>
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" :loading="isloading" class="submit-button" @click="onSubmit">立即登录</el-button>
       </el-form-item>
@@ -16,30 +18,71 @@
 </template>
 
 <script>
+import request from '@/utils/request.js'
+
 export default {
   data () {
     return {
       form: {
-        phoneNum: '',
-        code: ''
+        mobile: '17866912038',
+        code: '123456',
+        agree: false
       },
-      checked: true,
       isloading: false,
       rules: {
-        phoneNum: [
+        mobile: [
           { required: true, message: '请输入手机号', trigger: 'blur' },
           { pattern: /^1[1,3,5,7,8,9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }
         ],
         code: [
           { required: true, message: '请输入验证码', trigger: 'blur' },
-          { patten: /\d{6}/, message: '请输入正确的验证码', trigger: 'blur' }
+          { pattern: /^\d{6}$/, message: '请输入正确的验证码', trigger: 'blur' }
+        ],
+        agree: [
+          {
+            validator: (rule, value, callback) => {
+              if (value) {
+                callback()
+              } else {
+                callback(new Error('请同意用户协议'))
+              }
+            },
+            trigger: 'blur'
+          }
         ]
       }
     }
   },
   methods: {
     onSubmit () {
-      console.log('点击提交')
+      this.isloading = true
+      console.log(this.$refs['login-form'])
+      this.$refs['login-form'].validate((valid, data) => {
+        if (!valid) {
+          this.isloading = false
+          return
+        }
+        this.login()
+      })
+    },
+    login () {
+      const data = this.form
+      request(data).then(res => {
+        this.isloading = false
+        this.$message({
+          message: '登录成功',
+          type: 'success'
+        })
+        console.log(res)
+      }).catch(err => {
+        console.log(123)
+        console.log(err)
+        this.isloading = false
+        this.$message({
+          message: '登录失败，验证码错误',
+          type: 'error'
+        })
+      })
     }
   }
 }
@@ -60,7 +103,7 @@ export default {
       min-height: 500px;
       .checkbox {
         position: relative;
-        left: -80px;
+        left: -120px;
         text-aligin: center;
         margin-bottom: 20px;
       }
