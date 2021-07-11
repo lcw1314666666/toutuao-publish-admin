@@ -13,7 +13,12 @@ const routes = [
   {
     path: '/',
     name: 'Layout',
-    component: () => import('@/views/layout/layout.vue')
+    component: () => import('@/views/layout/layout.vue'),
+    childer: {
+      path: '/home',
+      name: 'Home',
+      component: () => import('@/views/home/home.vue')
+    }
   }
 ]
 const router = new VueRouter({
