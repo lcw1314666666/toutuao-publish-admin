@@ -75,7 +75,6 @@ export default {
         })
         console.log(res)
       }).catch(err => {
-        console.log(123)
         console.log(err)
         this.isloading = false
         this.$message({
