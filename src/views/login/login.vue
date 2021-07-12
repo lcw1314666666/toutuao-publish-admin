@@ -18,14 +18,14 @@
 </template>
 
 <script>
-import request from '@/utils/request.js'
-
+// import request from '@/utils/request.js'
+import { login } from '@/api/user.js'
 export default {
   data () {
     return {
       form: {
-        mobile: '17866912038',
-        code: '123456',
+        mobile: '13911111111',
+        code: '246810',
         agree: false
       },
       isloading: false,
@@ -56,32 +56,47 @@ export default {
   methods: {
     onSubmit () {
       this.isloading = true
-      console.log(this.$refs['login-form'])
+      // console.log(this.$refs['login-form'])
       this.$refs['login-form'].validate((valid, data) => {
         if (!valid) {
           this.isloading = false
           return
         }
-        this.login()
+        this.handleLogin()
       })
     },
-    login () {
+    async handleLogin () {
+      // 按钮加载中
+      this.isloading = true
       const data = this.form
-      request(data).then(res => {
-        this.isloading = false
-        this.$message({
-          message: '登录成功',
-          type: 'success'
-        })
+      try {
+        const res = await login(data)
         console.log(res)
-      }).catch(err => {
-        console.log(err)
+        // 请求成功
+        // 取消加载中状态
+        this.isloading = false
+        // 弹窗
+        this.$message({
+          type: 'success',
+          message: '登录成功'
+        })
+        // 本都存储
+        window.localStorage.setItem('user', JSON.stringify(res.data.data))
+        // 跳转页面
+        this.$router.push({
+          name: 'Home'
+        })
+      } catch (err) {
+        // 如果登录失败
+        // 取消加载中状态
+        // 弹窗提示登录失败
         this.isloading = false
         this.$message({
-          message: '登录失败，验证码错误',
-          type: 'error'
+          type: 'error',
+          message: '登录失败'
         })
-      })
+        console.log(err)
+      }
     }
   }
 }

@@ -1,12 +1,12 @@
 <template>
-  <div class="home">
-    home
+  <div class="image">
+    image
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Home',
+  name: 'Images',
   data () {
     return {}
   }

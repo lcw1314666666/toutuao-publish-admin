@@ -1,27 +1,26 @@
 <template>
   <el-container class="layout-content">
-    <el-aside width="200px">
-      <Aside class="aside"></Aside>
+    <el-aside width="auto">
+      <Aside class="aside" :isCollapse="isCollapse"></Aside>
     </el-aside>
     <el-container>
       <el-header class="layout-header">
         <div class="header-left">
-          <i class="el-icon-s-unfold"></i>
+          <i class="el-icon-s-unfold" @click="handleChangeCollapse" :class="{'el-icon-s-fold': !isCollapse, 'el-icon-s-unfold': isCollapse}"></i>
           <span>奶牛管理欢迎你</span>
         </div>
         <el-dropdown @command="handleCommand">
+          <img class="avater-image" :src="user.photo">
           <span class="el-dropdown-link">
-            <img src="http://img.duoziwang.com/2021/03/1623076300984136.jpg">
-            用户名<i class="el-icon-arrow-down el-icon--right"></i>
+            {{ user.name }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="a">设置</el-dropdown-item>
-            <el-dropdown-item command="b">退出</el-dropdown-item>
+            <el-dropdown-item command="b" @click.native="handleLogout">退出</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </el-header>
       <el-main>
-        main
         <router-view></router-view>
       </el-main>
     </el-container>
@@ -33,7 +32,10 @@ import Aside from './aside.vue'
 export default {
   name: 'Layout',
   data () {
-    return {}
+    return {
+      isCollapse: false,
+      user: null
+    }
   },
   components: {
     Aside
@@ -41,25 +43,65 @@ export default {
   methods: {
     handleCommand (command) {
       this.$message('click on item ' + command)
+    },
+    handleChangeCollapse () {
+      this.isCollapse = !this.isCollapse
+    },
+    handleLogout () {
+      console.log('退出')
+      // 用户点击退出
+      // 弹窗警告是否退出账号
+      // 如果通过弹窗确认退出，跳转到login页面
+      this.$confirm('是否退出当前账号?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        window.localStorage.removeItem('user')
+        this.$router.push({
+          name: 'Login'
+        })
+        this.$message({
+          type: 'success',
+          message: '退出成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消退出'
+        })
+      })
     }
+  },
+  created () {
+    this.user = JSON.parse(window.localStorage.getItem('user'))
+    // console.log(this.user)
   }
 }
 </script>
 
 <style lang="scss" scoped>
+.el-dropdown {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  .el-dropdown-link {
+    color: #333;
+  }
+}
+.avater-image {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}
 .layout-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  .el-dropdown-link{
-    img{
-      width: 30px;
-      height: 30px;
-    }
-  }
 }
 .aside {
-  width: 100%
+  //width: 100%;
+  height: 100%;
 }
 .layout-content {
   position: fixed;

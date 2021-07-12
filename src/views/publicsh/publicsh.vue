@@ -1,12 +1,12 @@
 <template>
-  <div class="home">
-    home
+  <div class="publicsh">
+    publicsh
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Home',
+  name: 'Publicsh',
   data () {
     return {}
   }
