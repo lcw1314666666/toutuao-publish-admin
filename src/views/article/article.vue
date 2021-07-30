@@ -39,7 +39,7 @@
           </el-date-picker>
         </el-form-item>
         <!--    搜索按钮-->
-        <el-button type="primary" @click="loadArticles(1)">查询</el-button>
+        <el-button type="primary" :disabled="loading" @click="loadArticles(1)">查询</el-button>
       </el-form>
     </el-card>
     <el-card class="box-card table-card">
@@ -52,6 +52,8 @@
         :data="articles"
         stripe
         style="width: 100%"
+        size="mini"
+        :v-loading="loading"
       >
         <el-table-column
           prop=""
@@ -97,7 +99,7 @@
             <el-button
               size="mini"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              @click="handleDelete(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -107,8 +109,10 @@
         layout="prev, pager, next"
         :total="tatalCount"
         class="table-pagination"
-        @current-change="loadArticles"
         :page-size="pageSize"
+        :disabled="loading"
+        :current-page.sync="page"
+        @current-change="loadArticles"
       >
       </el-pagination>
     </el-card>
@@ -116,7 +120,7 @@
 </template>
 
 <script>
-import { getArticles, getArticleChannels } from '@/api/article.js'
+import { getArticles, getArticleChannels, deleteArticle } from '@/api/article.js'
 export default {
   name: 'Article',
   data () {
@@ -165,7 +169,11 @@ export default {
       // 当前频道
       channelId: null,
       // 时间数组
-      rangeDate: null
+      rangeDate: null,
+      // 加载中标识
+      loading: false,
+      // 当前页
+      page: 1
     }
   },
   methods: {
@@ -175,10 +183,33 @@ export default {
     handleEdit (index, row) {
       console.log(index, row)
     },
-    handleDelete (index, row) {
-      console.log(index, row)
+    handleDelete (row) {
+      console.log(row)
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        // 删除一条数据
+        deleteArticle(row.id.toString()).then(res => {
+          console.log(res)
+          // 成功之后重新加载页面
+          this.loadArticles(this.page)
+        })
+        this.$message({
+          type: 'success',
+          message: '删除成功!'
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     loadArticles (page = 1) {
+      console.log('重新加载页面')
+      this.loading = true
       getArticles({
         page: page,
         pre_page: this.pageSize,
@@ -192,6 +223,7 @@ export default {
         const { total_count: tatalCount } = res.data.data
         this.articles = res.data.data.results
         this.tatalCount = tatalCount
+        this.loading = false
       })
     },
     loadArticleChannels () {
