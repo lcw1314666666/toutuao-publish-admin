@@ -9,7 +9,7 @@
         </el-breadcrumb>
       </div>
       <!--        form表单-->
-      <el-form ref="form" :rules="rule" :model="article" label-width="80px" size="mini" class="publich-form-box">
+      <el-form ref="ruleForm" :rules="rule" :model="article" label-width="80px" size="mini" class="publich-form-box">
         <el-form-item label="标题" prop="title">
           <el-input v-model="article.title"></el-input>
         </el-form-item>
@@ -41,7 +41,7 @@
           </el-dialog>
         </el-form-item>
         <el-form-item label="频道">
-          <el-select v-model="article.channel_id" placeholder="请选择频道">
+          <el-select v-model="article.channel_id" placeholder="请选择频道" prop="channel_id">
             <el-option
               :label="item.name"
               :value="item.id"
@@ -61,6 +61,7 @@
 
 <script>
 import { getArticleChannels, addArticle, getArticle, updateArticle } from '../../api/article'
+import { uploadImage } from '../../api/image'
 import {
   // 需要的 extensions
   Doc,
@@ -106,7 +107,15 @@ export default {
         new Paragraph(),
         new Heading({ level: 3 }),
         new Bold({ bubble: true }), // 在气泡菜单中渲染菜单按钮
-        new Image(),
+        new Image({
+          uploadRequest (file) {
+            const fd = new FormData()
+            fd.append('image', file)
+            return uploadImage(fd).then(res => {
+              return res.data.data.url
+            })
+          }
+        }),
         new Underline(), // 下划线
         new Italic(), // 斜体
         new Strike(), // 删除线
@@ -126,7 +135,19 @@ export default {
           { requried: true, message: '请输入标题', trigger: 'blur' },
           { min: 5, max: 10, message: '长度在 5 到 10 个字符', trigger: 'blur' }
         ],
-        content: [{ requried: true, message: '请输入内容', trigger: 'blur' }]
+        content: [
+          {
+            validator: (rule, value, callback) => {
+              if (value === '<p></p>>') {
+                callback(new Error('验证错误'))
+              } else {
+                callback()
+              }
+            }
+          },
+          { requried: true, message: '请输入内容', trigger: 'blur' }
+        ],
+        channel_id: [{ require: true, message: '请选择频道', trigger: 'blur' }]
       },
       dialogImageUrl: '',
       dialogVisible: false
@@ -135,44 +156,52 @@ export default {
   methods: {
     // 发布文章
     publicshArticle (draft) {
-      if (this.$route.query.id) {
-        // 如果有文章id则为编辑文章
-        updateArticle(this.$route.query.id, this.article, draft).then(res => {
-          if (res.data.message === 'OK') {
-            this.$router.push({
-              name: 'Article'
+      // 发布文章前先验证表单
+      this.$refs.ruleForm.validate(valid => {
+        if (!valid) {
+          return new Error('表单验证失败')
+        } else {
+          // 表单验证成功发送请求
+          if (this.$route.query.id) {
+            // 如果有文章id则为编辑文章
+            updateArticle(this.$route.query.id, this.article, draft).then(res => {
+              if (res.data.message === 'OK') {
+                this.$router.push({
+                  name: 'Article'
+                })
+                this.$message({
+                  message: '修改成功',
+                  type: 'success'
+                })
+              }
             })
-            this.$message({
-              message: '修改成功',
-              type: 'success'
+          } else {
+            // 没有文章id则为发布文章
+            addArticle(this.article, draft).then(res => {
+              if (res.data.message === 'OK') {
+                // 发布成功后，弹出消息提示，跳转页面
+                this.$message({
+                  message: `${draft === false ? '发布' : '存入草稿'}成功`,
+                  type: 'success'
+                })
+                // 清空输入框数据，
+                this.article = {
+                  title: '',
+                  content: '',
+                  cover: {
+                    type: 0,
+                    images: []
+                  },
+                  channel_id: null
+                }
+                this.$router.push({
+                  name: 'Article'
+                })
+              }
             })
           }
-        })
-      } else {
-        // 没有文章id则为发布文章
-        addArticle(this.article, draft).then(res => {
-          if (res.data.message === 'OK') {
-            // 发布成功后，弹出消息提示，跳转页面
-            this.$message({
-              message: `${draft === false ? '发布' : '存入草稿'}成功`,
-              type: 'success'
-            })
-            // 清空输入框数据，
-            this.article = {
-              title: '',
-              content: '',
-              cover: {
-                type: 0,
-                images: []
-              },
-              channel_id: null
-            }
-            this.$router.push({
-              name: 'Article'
-            })
-          }
-        })
-      }
+        }
+      })
     },
     // 获取频道列表
     getArticleChannels () {
