@@ -95,7 +95,7 @@
           <template slot-scope="scope">
             <el-button
               size="mini"
-              @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+              @click="handleCompile(scope.row)">编辑</el-button>
             <el-button
               size="mini"
               type="danger"
@@ -180,8 +180,9 @@ export default {
     onSubmit () {
       console.log('submit!')
     },
-    handleEdit (index, row) {
-      console.log(index, row)
+    handleCompile (row) {
+      // 编辑文章，页面跳转,并给url传参
+      this.$router.push(`/publicsh?id=${row.id}`)
     },
     handleDelete (row) {
       console.log(row)
@@ -192,7 +193,6 @@ export default {
       }).then(() => {
         // 删除一条数据
         deleteArticle(row.id.toString()).then(res => {
-          console.log(res)
           // 成功之后重新加载页面
           this.loadArticles(this.page)
         })
@@ -219,7 +219,6 @@ export default {
         end_pubdate: this.rangeDate ? this.rangeDate[1] : null
         // status: this.status
       }).then(res => {
-        console.log(res)
         const { total_count: tatalCount } = res.data.data
         this.articles = res.data.data.results
         this.tatalCount = tatalCount
