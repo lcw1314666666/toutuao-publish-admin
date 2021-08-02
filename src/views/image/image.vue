@@ -9,7 +9,7 @@
         </el-breadcrumb>
       </div>
       <div class="image-buttom-box">
-        <el-radio-group v-model="collect" @change="loadImages">
+        <el-radio-group v-model="collect" @change="loadImages(currentPage, collect)">
           <el-radio-button :label="false">全部</el-radio-button>
           <el-radio-button :label="true">收藏</el-radio-button>
         </el-radio-group>
@@ -91,10 +91,10 @@ export default {
     }
   },
   methods: {
-    loadImages (page) {
+    loadImages (page, collect = false) {
       getImages({
-        collect: this.collect,
-        page: page || this.currentPage
+        collect,
+        page
       }).then(res => {
         this.currentPage = res.data.data.page
         this.pageSize = res.data.data.per_page
@@ -107,14 +107,14 @@ export default {
     },
     uploadSuccess () {
       this.dialogImage = false
-      this.loadImages()
+      this.loadImages(1, false)
     },
     handleCurrentChange (page) {
-      this.loadImages(page)
+      this.loadImages(page, this.collect)
     }
   },
   created () {
-    this.loadImages()
+    this.loadImages(1, false)
   }
 }
 </script>
