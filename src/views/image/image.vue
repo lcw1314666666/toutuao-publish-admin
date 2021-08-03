@@ -15,26 +15,41 @@
         </el-radio-group>
         <el-button type="success" @click="uploadImage">上传素材</el-button>
       </div>
-      <el-row :gutter="20" justify="space-between" class="image-list-box">
+      <el-row :gutter="20" class="image-list-box">
         <el-col
+          :span="6"
           :lg="4"
           :md="6"
           :sm="6"
           :xs="12"
-          align="middle"
           v-for="(item, index) in images"
           :key="index"
           class="image-item"
         >
           <el-image
-            style="width: 150px; height: 100px"
+            style="width: 100%; height: 200px;"
             :src="item.url"
             fit="cover"
-            :preview-src-list="[item.url]"
-          ></el-image>
-          <div class="image-func">
-            <i class="el-icon-star-off"></i>
-            <i class="el-icon-delete"></i>
+          >
+          </el-image>
+          <div v-if="item.url" class="image-func">
+<!--            <i class="el-icon-star-off" @click="handleCollectClick(item.id, item.is_collected)"></i>-->
+<!--            <i class="el-icon-delete" @click="handleDelectClick(item.id)"></i>-->
+            <el-button
+              type="warning"
+              :icon="item['is_collected'] ? 'el-icon-star-on' : 'el-icon-star-off' "
+              size="mini"
+              :loading="item.isloading"
+              circle @click="handleCollectClick(item)"
+            ></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              circle
+              size="mini"
+              :loading="item.isloading"
+              @click="handleDelectClick(item)"
+            ></el-button>
           </div>
         </el-col>
       </el-row>
@@ -73,7 +88,7 @@
 </template>
 
 <script>
-import { getImages } from '@/api/image.js'
+import { getImages, collectImage, deleteImage } from '@/api/image.js'
 export default {
   name: 'Images',
   data () {
@@ -96,10 +111,16 @@ export default {
         collect,
         page
       }).then(res => {
+        // 给照片数组的每个对象都加一个loading属性
+        const results = res.data.data.results
+        results.forEach(item => {
+          item.isloading = false
+        })
         this.currentPage = res.data.data.page
         this.pageSize = res.data.data.per_page
         this.total = res.data.data.total_count
-        this.images = res.data.data.results
+        this.images = results
+        console.log(results)
       })
     },
     uploadImage () {
@@ -111,6 +132,43 @@ export default {
     },
     handleCurrentChange (page) {
       this.loadImages(page, this.collect)
+    },
+    handleCollectClick (img) {
+      // 收藏或取消收藏
+      img.isloading = true
+      collectImage(img.id, !img.is_collected).then(res => {
+        if (res.data.message === 'OK' && res.data.data.collect === true) {
+          // 收藏成功,跳转到收藏页面
+          // this.loadImages(1, true)
+          this.$message({
+            message: '收藏成功',
+            type: 'success'
+          })
+        } else if (res.data.message === 'OK' && res.data.data.collect === false) {
+          // 取消收藏成功
+          this.loadImages(1, true)
+          this.$message({
+            message: '取消收藏成功',
+            type: 'success'
+          })
+        }
+        img.isloading = false
+      })
+    },
+    handleDelectClick (img) {
+      img.isloading = true
+      // 删除
+      deleteImage(img.id).then(res => {
+        if (res.status === 204) {
+          // 删除成功
+          this.loadImages(this.currentPage, this.collect)
+          this.$message({
+            message: '删除成功',
+            type: 'success'
+          })
+          img.isloading = false
+        }
+      })
     }
   },
   created () {
@@ -127,47 +185,34 @@ export default {
     margin-bottom: 20px;
   }
   .image-list-box{
+    flex-wrap: wrap;
+    .el-col{
+      height: 200px;
+    }
     .image-item{
       position: relative;
+      //height: 130px;
       .image-func{
-        height: 20px;
-        background: #000000;
-        color: #1f2d3d;
-        opacity: 0.1;
+        height: 40px;
+        width: 90%;
+        background-color: rgba(201, 201, 201, 0.5);
         display: flex;
         justify-content: space-around;
+        align-items: center;
         position: absolute;
         left: 0;
-        left: 0;
+        right: 0;
         bottom: 0;
+        color: pink;
+        margin: 0 12px;
+        font-size: 23px;
+        .el-button{
+          width: 30px;
+          height: 30px;
+          cursor: pointer;
+        }
       }
     }
   }
-}
-.el-row {
-  margin-bottom: 20px;
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-.el-col {
-  border-radius: 4px;
-}
-.bg-purple-dark {
-  background: #99a9bf;
-}
-.bg-purple {
-  background: #d3dce6;
-}
-.bg-purple-light {
-  background: #e5e9f2;
-}
-.grid-content {
-  border-radius: 4px;
-  min-height: 36px;
-}
-.row-bg {
-  padding: 10px 0;
-  background-color: #f9fafc;
 }
 </style>
