@@ -5,7 +5,7 @@
         <!--    面包屑-->
         <el-breadcrumb separator="/" class="article-breadcrumb">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item><a href="/">素材管理</a></el-breadcrumb-item>
+          <el-breadcrumb-item>素材管理</el-breadcrumb-item>
         </el-breadcrumb>
       </div>
       <div class="image-buttom-box">
