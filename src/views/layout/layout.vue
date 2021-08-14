@@ -29,6 +29,8 @@
 
 <script>
 import Aside from './aside.vue'
+import { getUserProfile } from '@/api/user.js'
+import globalBus from '@/utils/global-bus.js'
 export default {
   name: 'Layout',
   data () {
@@ -76,6 +78,14 @@ export default {
   created () {
     this.user = JSON.parse(window.localStorage.getItem('user'))
     // console.log(this.user)
+    getUserProfile().then(res => {
+      this.user = res.data.data
+    })
+    globalBus.$on('userMessageChange', user => {
+      this.user.name = user.name
+      this.user.photo = user.photo
+      console.log(this)
+    })
   }
 }
 </script>
@@ -93,6 +103,7 @@ export default {
   width: 35px;
   height: 35px;
   border-radius: 50%;
+  padding: 0 15px;
 }
 .layout-header {
   display: flex;
