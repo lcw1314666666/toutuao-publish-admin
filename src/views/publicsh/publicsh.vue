@@ -29,13 +29,20 @@
             <el-radio :label="0">无图</el-radio>
             <el-radio :label="-1">自动</el-radio>
           </el-radio-group>
-          <el-upload
-            action="https://jsonplaceholder.typicode.com/posts/"
-            list-type="picture-card"
-            :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove">
-            <i class="el-icon-plus"></i>
-          </el-upload>
+          <template v-if="article.cover.type">
+            <UploadImage
+              v-for="(item, index) in  article.cover.type"
+              :key="item"
+              v-model="article.cover.images[index]"
+            ></UploadImage>
+<!--            <UploadImage-->
+<!--              v-for="(item, index) in  article.cover.type"-->
+<!--              :key="item"-->
+<!--              v-model="article.cover.images[index]"-->
+<!--              :coverImage = article.cover.images[index]-->
+<!--              @uploadImage="handleUploadImage(index, $event)"-->
+<!--            ></UploadImage>-->
+          </template>
           <el-dialog :visible.sync="dialogVisible">
             <img width="100%" :src="dialogImageUrl" alt="">
           </el-dialog>
@@ -60,6 +67,7 @@
 </template>
 
 <script>
+import UploadImage from './uploadImage.vue'
 import { getArticleChannels, addArticle, getArticle, updateArticle } from '../../api/article'
 import { uploadImage } from '../../api/image'
 import {
@@ -88,6 +96,7 @@ import {
 export default {
   name: 'Publicsh',
   components: {
+    UploadImage
   },
   data () {
     return {
@@ -229,6 +238,10 @@ export default {
     handlePictureCardPreview (file) {
       this.dialogImageUrl = file.url
       this.dialogVisible = true
+    },
+    input (index, file) {
+      console.log(index, file)
+      this.article.cover.images[index] = file
     }
   },
   created () {
