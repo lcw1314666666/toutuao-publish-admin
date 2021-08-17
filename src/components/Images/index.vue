@@ -5,7 +5,7 @@
         <el-radio-button :label="false">全部</el-radio-button>
         <el-radio-button :label="true">收藏</el-radio-button>
       </el-radio-group>
-      <el-button type="success" @click="uploadImage">上传素材</el-button>
+      <el-button v-if="isShowAdd" type="success" @click="uploadImage">上传素材</el-button>
     </div>
     <el-row :gutter="20" class="image-list-box">
       <el-col
@@ -17,6 +17,7 @@
         v-for="(item, index) in images"
         :key="index"
         class="image-item"
+        @click.native="Selected = index"
       >
         <el-image
           style="width: 100%; height: 200px;"
@@ -24,7 +25,8 @@
           fit="cover"
         >
         </el-image>
-        <div v-if="item.url" class="image-func">
+        <div class="image-selected" v-if="Selected === index && isSelected"></div>
+        <div v-if="item.url && isShowcollect" class="image-func">
           <!--            <i class="el-icon-star-off" @click="handleCollectClick(item.id, item.is_collected)"></i>-->
           <!--            <i class="el-icon-delete" @click="handleDelectClick(item.id)"></i>-->
           <el-button
@@ -32,7 +34,8 @@
             :icon="item['is_collected'] ? 'el-icon-star-on' : 'el-icon-star-off' "
             size="mini"
             :loading="item.isloading"
-            circle @click="handleCollectClick(item)"
+            circle
+            @click="handleCollectClick(item)"
           ></el-button>
           <el-button
             type="danger"
@@ -82,6 +85,20 @@
 import { getImages, collectImage, deleteImage } from '@/api/image.js'
 export default {
   name: 'ImagesComponent',
+  props: {
+    isShowAdd: {
+      type: Boolean,
+      default: true
+    },
+    isShowcollect: {
+      type: Boolean,
+      default: true
+    },
+    isSelected: {
+      type: Boolean,
+      default: false
+    }
+  },
   data () {
     const user = JSON.parse(window.localStorage.getItem('user'))
     return {
@@ -93,7 +110,8 @@ export default {
       },
       currentPage: 1,
       total: 0,
-      pageSize: 0
+      pageSize: 0,
+      Selected: null
     }
   },
   methods: {
@@ -182,6 +200,19 @@ export default {
     .image-item{
       position: relative;
       //height: 130px;
+      .image-selected{
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        width: 100%;
+        background-image: url("../../assets/images/imageListSelected/selected.png");
+        background-size: 100%;
+        background-repeat: no-repeat;
+        opacity: 0.8;
+      }
       .image-func{
         height: 40px;
         width: 90%;
